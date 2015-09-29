@@ -3,41 +3,43 @@
 
 // but you don't so you're going to write it from scratch:
 
-// JSON.stringify({ x: 5, y: 6 });
-//'{"x":5,"y":6}' or '{"y":6,"x":5}'
-
 var stringifyJSON = function(obj) {
-	console.log(typeof obj, obj);		// for debugging purposes; remove when done
   if (Array.isArray(obj)) {
-  	if (obj.length === 0) {		// Checks for empty array
-  		return '[]';
-  	}
+    if (obj.length === 0) {   // Checks for empty array
+      return '[]';
+    }
 
-  	return obj.map(function(x) {
-  		return stringifyJSON(x);
-  	})
+    obj = obj.map(function(x) {
+      return stringifyJSON(x);
+    })
+
+    return '[' + obj + ']';
+
   } else if (typeof obj === 'string') {
-  	return '"' + obj + '"';
-  } else if (obj === null) {
-  	return 'null';
+    return '"' + obj + '"';
   } else if (typeof obj === 'boolean') {
-  	return String(obj);
+    return String(obj);
   } else if (typeof obj === 'number') {
-  	return String(obj);
+    return String(obj);
+  } else if (obj === null) {
+    return 'null';
+  } else if (typeof obj === 'function' || obj === undefined) {
+    return ;
   } else if (typeof obj === 'object') {
 
-  	if (Object.keys(obj).length === 0) {		// Checks for empty objects
-  		return 'null';
-  	}
+    if (Object.keys(obj).length === 0) {    // Checks for empty objects
+      return '{}';
+    }
 
-  	var result = [];
+    var result = [];
 
-  	for (var key in obj) {
-  		result.push('"' + key + '":' + obj[key]);
-  	}
+    for (var key in obj) {
+      if (typeof obj[key] === 'function' || obj[key] === undefined) {   // Skips current element for functions or undefined values in objects
+        continue;
+      }
+      result.push(stringifyJSON(key) + ':' + stringifyJSON(obj[key]));
+    }
 
-  	return '{' + result.join(',') + '}';
-  } else {
-  	return String(obj);		// returns if obj is a boolean or number
-  }
+    return '{' + result.join(',') + '}';
+  } 
 };
